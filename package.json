@@ -20,8 +20,10 @@
     "typescript": "^5.7.2"
   },
   "dependencies": {
+    "@supabase/supabase-js": "^2.47.10",
     "@types/bcryptjs": "^2.4.6",
     "@types/jsonwebtoken": "^9.0.7",
+    "dotenv": "^16.4.7",
     "express": "^4.21.2",
     "pg": "^8.13.1"
   }
