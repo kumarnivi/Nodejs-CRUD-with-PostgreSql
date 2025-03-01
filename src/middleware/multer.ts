@@ -19,4 +19,5 @@ const storage = multer.diskStorage({
 
 const upload = multer({ storage });
 
-export default upload;
+export const uploadMultiple = upload.array('image', 5); // 'images' should match frontend key
+
