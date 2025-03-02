@@ -20,20 +20,28 @@ export const addVehicle = async (req: any, res: any) => {
 
 export const getVehiclesByLocationAndCategory = async (req: any, res: any) => {
     try {
-        const { location, category_id } = req.query;
+        const { category_id, location } = req.query;
 
-        // Validate query parameters
-        if (!location || !category_id) {
-            return res.status(400).json({ error: "Location and Category are required!" });
+        // Validate category_id first
+        if (!category_id) {
+            return res.status(400).json({ error: "Category is required!" });
         }
 
-        // Fetch vehicles with case-insensitive location search
+        if (!location) {
+            // Fetch locations for the selected category
+            const locations = await pool.query(
+                `SELECT DISTINCT location FROM vehicles WHERE category_id = $1`,
+                [category_id]
+            );
+            return res.status(200).json(locations.rows);
+        }
+
+        // Fetch vehicles after category and location are selected
         const vehicles = await pool.query(
-            `SELECT * FROM vehicles WHERE location ILIKE $1 AND category_id = $2`,
-            [`%${location}%`, category_id] // Allows partial matching too
+            `SELECT * FROM vehicles WHERE category_id = $1 AND location ILIKE $2`,
+            [category_id, `%${location}%`] // Partial matching for location
         );
 
-        // Check if any vehicles were found
         if (vehicles.rows.length === 0) {
             return res.status(404).json({ message: "No vehicles found for the given location and category." });
         }

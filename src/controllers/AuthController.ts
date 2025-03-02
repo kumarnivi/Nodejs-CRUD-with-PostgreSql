@@ -52,7 +52,7 @@ export class AuthController  {
           }
     
           // Generate JWT
-          const token = jwt.sign({ id: user.id, role: user.role }, process.env.JWT_SECRET as string, {
+          const token = jwt.sign({ id:user.id, role:user.role }, process.env.JWT_SECRET as string, {
             expiresIn: "1h"
           });
 
@@ -62,7 +62,13 @@ export class AuthController  {
                                     path: "/", 
           });
 
-          res.status(200).json({ message: "Logged in Successfully!" , token, user:user.role, id:user.id  });
+          res.cookie("userId", user.id, { httpOnly: true ,
+            secure: true,       // Required for SameSite=None
+            sameSite: "None",   // Allows cross-origin
+            path: "/", 
+});
+
+          res.status(200).json({ message: "Logged in Successfully!" , token, user:user.role });
 
         } catch (err:any) {
           console.error("Login Error: ", err);
