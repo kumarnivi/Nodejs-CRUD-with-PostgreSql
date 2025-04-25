@@ -48,3 +48,8 @@ export const bookVehicle = async (userId: number, data: any) => {
         throw new Error(error.message);
     }
 };
+
+export const Allbooking = async () => {
+    const { rows } = await pool.query('SELECT * FROM bookings');
+    return rows;
+};

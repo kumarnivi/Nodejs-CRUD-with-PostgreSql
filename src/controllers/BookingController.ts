@@ -1,5 +1,5 @@
 import { Request, Response } from 'express';
-import { bookVehicle } from '../models/BookingModel';
+import { Allbooking, bookVehicle } from '../models/BookingModel';
 
 
 export const booking  = async (req:any, res:any) => {
@@ -10,4 +10,14 @@ export const booking  = async (req:any, res:any) => {
         res.status(500).json({ message: "Error booking vehicle", error: error.message });
     }
 
+}
+
+export const  getBooking = async (req:any, res:any) => {
+    try {
+        const result = await Allbooking();
+        return res.status(201).json ({message:"fetch successfully", result});
+
+    } catch (error:any) {
+        res.status(500).json({message:"internal server error", err:error.message})
+    }
 }

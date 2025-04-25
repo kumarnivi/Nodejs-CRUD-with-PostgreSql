@@ -12,26 +12,32 @@ const client = new OAuth2Client(process.env.GOOGLE_CLIENT_ID);
 
 
 export class AuthController  {
-    static async register(req:any, res:any) {
-        const {username, email,password,role} = req.body;
-        const profileImage = req.file ? req.file.filename : '';
+  static async register(req: any, res: any) {
+    const { username, email, password, role } = req.body;
+    const profileImage = req.file ? req.file.filename : '';
 
-        try {
-            const existingUser = await pool.query(`SELECT * FROM public."users" WHERE email = $1`, [email]);
+    try {
+        const existingUser = await pool.query(`SELECT * FROM public."users" WHERE email = $1`, [email]);
 
-            if (existingUser.rows.length > 0){
-                return res.status(400).json({ message: "User already exists" });
-            } 
-            const hashedPassword = await bcrypt.hash(password, 10);
-            const newUser = pool.query(`INSERT INTO "users" (username, email, password, role, profileImage)
-            VALUES ($1, $2, $3, $4, $5)`, [username, email, hashedPassword, role, profileImage]);   
+        if (existingUser.rows.length > 0) {
+            return res.status(400).json({ message: "User already exists" });
+        }
 
-            res.status(201).json({message:'User registered successfully',newUser})
-        } 
-         catch (err) {
-            res.status(500).json({message:"Server Error", err})
-        } 
+        const hashedPassword = await bcrypt.hash(password, 10);
+
+        // Add await here
+        const newUser = await pool.query(
+            `INSERT INTO "users" (username, email, password, role, profileImage)
+             VALUES ($1, $2, $3, $4, $5) RETURNING *`,
+            [username, email, hashedPassword, role, profileImage]
+        );
+
+        res.status(201).json({ message: 'User registered successfully', newUser: newUser.rows[0] });
+    } catch (err) {
+        res.status(500).json({ message: "Server Error", err });
     }
+}
+
     
     static async login(req: any, res: any) {
 
