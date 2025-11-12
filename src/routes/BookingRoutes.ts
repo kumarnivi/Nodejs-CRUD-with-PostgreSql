@@ -1,11 +1,13 @@
 import express from 'express';
-import { booking, getBooking } from '../controllers/BookingController';
-import { verifyToken } from '../middleware/AuthMiddleware';
+import { bookVehicle, getBookings } from '../controllers/BookingController';
+import { verifyToken, checkRole } from '../middleware/AuthMiddleware';
 
-const bookingRouts = express.Router();
+const bookingRouter = express.Router();
 
-bookingRouts.post('/booking', verifyToken,  booking)
-bookingRouts.get('/allbooking', getBooking )
+// Book a vehicle (user role)
+bookingRouter.post('/', verifyToken, checkRole(["user"]), bookVehicle);
 
-export default bookingRouts;
+// Get all bookings (admin only)
+bookingRouter.get('/all', verifyToken, checkRole(["admin"]), getBookings);
 
+export default bookingRouter;

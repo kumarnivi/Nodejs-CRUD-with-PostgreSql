@@ -1,4 +1,5 @@
-import { Entity, PrimaryGeneratedColumn, Column, BaseEntity } from "typeorm";
+import { Entity, PrimaryGeneratedColumn, Column, BaseEntity, OneToMany } from "typeorm";
+import { Booking } from "./Booking";
 
 export enum Role {
   USER = 'user',
@@ -7,25 +8,31 @@ export enum Role {
 
 @Entity("users")
 export class User extends BaseEntity {
-  static password(password: any, password1: any) {
-      throw new Error("Method not implemented.");
-  }
   @PrimaryGeneratedColumn()
-  id: number | undefined;
+  id!: number;
 
   @Column()
-  username: string | undefined;
+  username!: string;
 
   @Column({ unique: true })
-  email: string | undefined;
+  email!: string;
 
   @Column()
-  password: string | undefined;
+  password!: string;
 
-  @Column({type:"enum",enum:Role, default:Role.USER})
-  role:Role | undefined;
+  @Column({ type: "enum", enum: Role, default: Role.USER })
+  role!: Role;
 
   @Column({ nullable: true })
-  profileImage: string | undefined;
-}
+  profileImage?: string;
 
+  @OneToMany(() => Booking, booking => booking.user)
+  bookings!: Booking[];
+
+  // Add these for OTP functionality
+ @Column({ type: 'varchar', nullable: true })
+  otp?: string | null;
+
+  @Column({ type: "timestamp", nullable: true })
+  otp_expiry?: Date | null;
+}
