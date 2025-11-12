@@ -45,8 +45,6 @@ userRouter.get('/', verifyToken, checkRole(["admin"]), AuthController.getAllUser
 // Create a new user (admin) with profile image
 userRouter.post(
   '/',
-  verifyToken,
-  checkRole(["admin"]),
   upload.single("profileImage"), // "profileImage" matches the field in the request form
   AuthController.register
 );
